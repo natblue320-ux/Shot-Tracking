@@ -1,6 +1,6 @@
 /* Service worker : fonctionnement hors ligne.
    Stratégie : on sert le cache tout de suite et on le met à jour en arrière-plan. */
-const V = 'mes-tirs-v1';
+const V = 'mes-tirs-v2';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
