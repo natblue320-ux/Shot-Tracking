@@ -221,7 +221,7 @@ const sumShots=a=>a.reduce((x,h)=>x+h.m,0);
 const ui={tab:'saisie',lastTab:null,sheets:[],flash:null,
   form:{kind:'training',date:todayISO(),dt:0,opp:'',place:'',ex:'',dur:'',defType:'',note:''},
   st:{period:'all',kind:'all',type:'all',range:'week'}};
-const top=()=>ui.sheets[ui.sheets.length-1];
+const topSheet=()=>ui.sheets[ui.sheets.length-1];
 
 /* ========== Écran de veille / vibration ========== */
 let wl=null;
@@ -661,12 +661,12 @@ const A={
   closesheet(){closeSheet()},
   gosaisie(){ui.sheets=[];ui.tab='saisie';refresh()},
   shotedit(el){const s=sessById(el.dataset.sid),i=+el.dataset.i;if(s&&s.shots[i])openSheet({k:'shot',sid:s.id,i,d:Object.assign({},s.shots[i])})},
-  'sh-res'(el){top().d.m=+el.dataset.v;renderSheets()},
-  'sh-type'(el){applyType(top().d,el.dataset.v,true);renderSheets()},
-  'sh-zone'(el){applyZone(top().d,el.dataset.z);renderSheets()},
-  'sh-sit'(el){const d=top().d;d.s=d.s===el.dataset.v?null:el.dataset.v;renderSheets()},
-  'sh-save'(){const o=top(),s=sessById(o.sid);if(s&&s.shots[o.i]){Object.assign(s.shots[o.i],{m:o.d.m,ty:o.d.ty,z:o.d.z,s:o.d.s});save();toast('Tir modifié ✓')}closeSheet()},
-  'sh-del'(){const o=top(),s=sessById(o.sid);if(!confirm('Supprimer ce tir ?'))return;if(s){s.shots.splice(o.i,1);save()}closeSheet()},
+  'sh-res'(el){topSheet().d.m=+el.dataset.v;renderSheets()},
+  'sh-type'(el){applyType(topSheet().d,el.dataset.v,true);renderSheets()},
+  'sh-zone'(el){applyZone(topSheet().d,el.dataset.z);renderSheets()},
+  'sh-sit'(el){const d=topSheet().d;d.s=d.s===el.dataset.v?null:el.dataset.v;renderSheets()},
+  'sh-save'(){const o=topSheet(),s=sessById(o.sid);if(s&&s.shots[o.i]){Object.assign(s.shots[o.i],{m:o.d.m,ty:o.d.ty,z:o.d.z,s:o.d.s});save();toast('Tir modifié ✓')}closeSheet()},
+  'sh-del'(){const o=topSheet(),s=sessById(o.sid);if(!confirm('Supprimer ce tir ?'))return;if(s){s.shots.splice(o.i,1);save()}closeSheet()},
   addshot(el){const s=sessById(el.dataset.id);if(!s)return;const ty=s.defType||null;s.shots.push({t:Date.now(),m:+el.dataset.m,ty,z:ty==='ft'?'ft':null,s:null});save();buzz(20);refresh()},
   skind(el){const s=sessById(el.dataset.id);if(!s)return;s.kind=el.dataset.v;save();refresh()},
   reopen(el){const s=sessById(el.dataset.id);if(!s||active())return;s.status='active';s.segStart=Date.now();s.lastTick=Date.now();db.activeId=s.id;save();ui.sheets=[];ui.tab='saisie';refresh()},
@@ -676,9 +676,9 @@ const A={
   range(el){ui.st.range=el.dataset.v;refresh()},
   addgoal(){openSheet({k:'goal',old:null,scope:'ft',target:''})},
   editgoal(el){const g=db.goals.find(x=>x.scope===el.dataset.scope);if(g)openSheet({k:'goal',old:g.scope,scope:g.scope,target:g.target})},
-  'g-save'(){const o=top(),t=parseInt(o.target,10);if(!(t>=1&&t<=100)){toast('Entrez un pourcentage entre 1 et 100');return}
+  'g-save'(){const o=topSheet(),t=parseInt(o.target,10);if(!(t>=1&&t<=100)){toast('Entrez un pourcentage entre 1 et 100');return}
     db.goals=db.goals.filter(g=>g.scope!==o.scope&&g.scope!==o.old);db.goals.push({scope:o.scope,target:t});save();closeSheet();toast('Objectif enregistré ✓')},
-  'g-del'(){const o=top();if(!confirm('Supprimer cet objectif ?'))return;db.goals=db.goals.filter(g=>g.scope!==o.old);save();closeSheet()},
+  'g-del'(){const o=topSheet();if(!confirm('Supprimer cet objectif ?'))return;db.goals=db.goals.filter(g=>g.scope!==o.old);save();closeSheet()},
   export(){exportCSV()},
   import(){$('#fi').click()},
   wipe(){if(!confirm('Effacer TOUTES les sessions, tirs et objectifs de cet appareil ?'))return;if(!confirm('Dernière confirmation : cette action est irréversible.'))return;
@@ -692,7 +692,7 @@ const C={
     if(k==='durMin')v=v===''?null:Math.max(1,parseInt(v,10)||1);
     if(k==='defType')v=v||null;
     s[k]=v;save()},
-  gf(el){const o=top();if(!o)return;o[el.dataset.k]=el.value}
+  gf(el){const o=topSheet();if(!o)return;o[el.dataset.k]=el.value}
 };
 document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el||el.disabled)return;const f=A[el.dataset.a];if(f)f(el,e)});
 const onChange=e=>{const el=e.target.closest&&e.target.closest('[data-c]');if(el&&C[el.dataset.c])C[el.dataset.c](el,e)};
